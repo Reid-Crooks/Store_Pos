@@ -10,7 +10,7 @@ def store_header(text, option1, option2):
     print(f"#{store_name.center(75)}#")
     print_line()
     print(f"# {header} #")
-    print(f"# Date: {str(Constants.DATE).ljust(38)}Cart Items: {str(len(cart.items)).rjust(3, '0')} | {format_currency(cart.total_price)} #")
+    print(f"# Date: {str(Constants.DATE).ljust(38)}Cart Items: {str(len(Cart.items)).rjust(3, '0')} | {format_currency(cart.total_price)} #")
     print_line()
 
 def format_currency(amount):
@@ -141,27 +141,27 @@ def show_invoice():
     cart.print_list()
     print_line()
     discount = 0.0
-    Cart.subtotal_price = Cart.total_price
-    Cart.sales_tax = Cart.subtotal_price * Constants.SALES_TAX
-    Cart.total_price = Cart.total_price * Constants.SALES_TAX
-    if Cart.total_price > 5000:
-      discount = Cart.total_price * 0.05
-      Cart.total_price -= discount
-    print(f"SUBTOTAL COST: ".ljust(18) + str(format_currency(Cart.subtotal_price)))
-    print(f"SALES TAX (10%): ".ljust(18) + str(format_currency(Cart.sales_tax)))
+    cart.subtotal_price = cart.total_price
+    cart.sales_tax = cart.subtotal_price * Constants.SALES_TAX
+    cart.total_price = cart.total_price * Constants.SALES_TAX
+    if cart.total_price > 5000:
+      discount = cart.total_price * 0.05
+      cart.total_price -= discount
+    print(f"SUBTOTAL COST: ".ljust(18) + str(format_currency(cart.subtotal_price)))
+    print(f"SALES TAX (10%): ".ljust(18) + str(format_currency(cart.sales_tax)))
     if discount > 0:
       print(f"DISCOUNT (5%): ".ljust(18) + str(format_currency(discount)))
-    print(f"TOTAL COST: ".ljust(18) + str(format_currency(Cart.total_price)))
-    print("CUSTOMER PAYMENT: ".ljust(18) + str(format_currency(Cart.payment)))
-    print("CUSTOMER CHANGE: ".ljust(18) + str(format_currency(Cart.payment - Cart.total_price)))
+    print(f"TOTAL COST: ".ljust(18) + str(format_currency(cart.total_price)))
+    print("CUSTOMER PAYMENT: ".ljust(18) + str(format_currency(cart.payment)))
+    print("CUSTOMER CHANGE: ".ljust(18) + str(format_currency(cart.payment - cart.total_price)))
     print_line()
     print("THANKS FOR SHOPPING".center(75))
     print_line()
     input("\nPress any key to continue!!!!")
     #cart.clear()
-    Cart.total_price = 0.0
-    Cart.payment = 0.0
-    Cart.items = []
+    cart.total_price = 0.0
+    cart.payment = 0.0
+    cart.items = []
 
 
 def remove_from_cart():
