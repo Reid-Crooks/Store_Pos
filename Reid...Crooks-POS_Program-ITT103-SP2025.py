@@ -10,7 +10,7 @@ def store_header(text, option1, option2):
     print(f"#{store_name.center(75)}#")
     print_line()
     print(f"# {header} #")
-    print(f"# Date: {str(Constants.DATE).ljust(38)}Cart Items: {str(len(Cart.items)).rjust(3, '0')} | {format_currency(cart.total_price)} #")
+    print(f"# Date: {str(Constants.DATE).ljust(38)}Cart Items: {str(len(cart.items)).rjust(3, '0')} | {format_currency(cart.total_price)} #")
     print_line()
 
 def format_currency(amount):
