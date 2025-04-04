@@ -10,7 +10,7 @@ def store_header(text, option1, option2):
     print(f"#{store_name.center(75)}#")
     print_line()
     print(f"# {header} #")
-    print(f"# Date: {str(Constants.DATE).ljust(38)}Cart Items: {str(len(Cart.items)).rjust(3, '0')} | {format_currency(Cart.total_price)} #")
+    print(f"# Date: {str(Constants.DATE).ljust(38)}Cart Items: {str(len(Cart.items)).rjust(3, '0')} | {format_currency(cart.total_price)} #")
     print_line()
 
 def format_currency(amount):
@@ -33,14 +33,14 @@ class Inventory:
         for i, item in enumerate(inventory.items):
             
              #check if the item if already in the cart and update it
-            for index, citem in enumerate(Cart.items):
+            for index, citem in enumerate(cart.items):
                 if productId == citem[0]:
                     
                     #update existing cart info
-                    Cart.items[index] = (citem[0], productAmt + citem[1])
+                    cart.items[index] = (citem[0], productAmt + citem[1])
                     #update cart total price
                     addedPrice = item[2] * productAmt
-                    Cart.total_price += addedPrice
+                    cart.total_price += addedPrice
                 
                     self.items[index] = (item[0], item[1], item[2], item[3]-productAmt)
                     
@@ -48,8 +48,8 @@ class Inventory:
             
             if item[0] == productId:
                 if productAmt <= item[3]:
-                    Cart.items.append((item[0], productAmt))
-                    Cart.total_price += productAmt * item[2]
+                    cart.items.append((item[0], productAmt))
+                    cart.total_price += productAmt * item[2]
                     self.items[i] = (item[0], item[1], item[2], item[3]-productAmt)
                 else:
                     print("Product amount not available")
@@ -166,18 +166,18 @@ def show_invoice():
 
 def remove_from_cart():
     prdId = valid_input("Enter Product ID to remove: ",)
-    for i, (item_id, qty) in enumerate(Cart.items):
+    for i, (item_id, qty) in enumerate(cart.items):
         if item_id == prdId:
             prdAmt = valid_input(f"Enter Amount to remove (max {qty}): ",)
             if prdAmt <= qty:
-                Cart.items[i] = (item_id, qty-prdAmt)
-                Cart.total_price -= prdAmt* next(item [2] for item in inventory.items if item [0] == item_id)
+                cart.items[i] = (item_id, qty-prdAmt)
+                cart.total_price -= prdAmt* next(item [2] for item in inventory.items if item [0] == item_id)
                 for j, item in enumerate(inventory.items):
                     if item[0] == prdId:
                         inventory.items[j] = (item[0], item[1], item[2], item[3] + prdAmt)
                         break
-                    if Cart.items[i][1] == 0:
-                        Cart.items.pop(i)
+                    if cart.items[i][1] == 0:
+                        cart.items.pop(i)
                         print("Product removed from cart.")
                         store_cart()
                         return
