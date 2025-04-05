@@ -1,3 +1,8 @@
+#####################################################
+#Author: Melodia Reid, Fahim Crooks                #
+#Date: April 5, 2025                               #
+#Desc: This is a group effort for a POS system.    #
+####################################################
 import datetime
 import os
 import platform
@@ -10,12 +15,15 @@ def store_header(text, option1, option2):
     print(f"#{store_name.center(75)}#")
     print_line()
     print(f"# {header} #")
-    print(f"# Date: {str(Constants.DATE).ljust(38)}Cart Items: {str(len(Cart.items)).rjust(3, '0')} | {format_currency(cart.total_price)} #")
+    print(
+        f"# Date: {str(Constants.DATE).ljust(38)}Cart Items: {str(len(Cart.items)).rjust(3, '0')} | {format_currency(Cart.subtotal_price)} #")
     print_line()
+
 
 def format_currency(amount):
     locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
     return locale.currency(amount, grouping=True).rjust(11, ' ')
+
 
 class Inventory:
     items = []
@@ -24,40 +32,40 @@ class Inventory:
         print(f"PRODUCT ID".ljust(12) + "PRODUCT NAME".ljust(32) + "PRICE".ljust(24) + "QUANTITY")
         for product_id, product, price, stock in self.items:
             if stock <= Constants.MIN_INVENTORY_AMT:
-                low_stock= "(LOW STOCK)"
+                low_stock = "(LOW STOCK)"
             else:
-                low_stock =""
-            print(f"{str(product_id).ljust(6)}\t\t{product.ljust(20)}\t\t\t{price}\t\t\t\t\t{int(stock)} {low_stock}")
+                low_stock = ""
+            print(
+                f"{str(product_id).ljust(6)}\t\t{product.ljust(20)}\t\t\t{format_currency(price)}\t\t\t\t\t{int(stock)} {low_stock}")
 
     def add_to_cart(self, productId, productAmt):
         for i, item in enumerate(inventory.items):
-            
-             #check if the item if already in the cart and update it
+
+            # check if the item if already in the cart and update it
             for index, citem in enumerate(cart.items):
                 if productId == citem[0]:
-                    
-                    #update existing cart info
+                    # update existing cart info
                     cart.items[index] = (citem[0], productAmt + citem[1])
-                    #update cart total price
+                    # update cart total price
                     addedPrice = item[2] * productAmt
-                    cart.total_price += addedPrice
-                
-                    self.items[index] = (item[0], item[1], item[2], item[3]-productAmt)
-                    
+                    Cart.subtotal_price += addedPrice
+
+                    self.items[index] = (item[0], item[1], item[2], item[3] - productAmt)
+
                     return
-            
+
             if item[0] == productId:
                 if productAmt <= item[3]:
-                    cart.items.append((item[0], productAmt))
-                    cart.total_price += productAmt * item[2]
-                    self.items[i] = (item[0], item[1], item[2], item[3]-productAmt)
+                    Cart.items.append((item[0], productAmt))
+                    Cart.subtotal_price += productAmt * item[2]
+                    self.items[i] = (item[0], item[1], item[2], item[3] - productAmt)
                 else:
                     print("Product amount not available")
                 return
         print("Product not found")
 
     def add_to_inventory(self, name, price, quantity):
-        self.items.append((len(self.items)+1, name, price, int(quantity)))
+        self.items.append((len(self.items) + 1, name, price, int(quantity)))
 
     def load_inventory(self):
         init_list = [
@@ -77,10 +85,11 @@ class Inventory:
             self.items.append(item)
         print("")
 
+
 class Cart:
     items = []
-    total_price = 0.0
     subtotal_price = 0.0
+    subtotal_price_tax = 0.0
     payment = 0.0
 
     def print_list(self):
@@ -88,36 +97,45 @@ class Cart:
         for key, amt in self.items:
             for item_id, name, price, stock in inventory.items:
                 if item_id == key:
-                    print(f"{str(item_id).ljust(25)}{str(name).ljust(20)}{str(price).ljust(23)}{int(amt)}")
+                    print(
+                        f"{str(item_id).ljust(25)}{str(name).ljust(20)}{str(format_currency(price)).ljust(23)}{int(amt)}")
                     break  # end loop once found.
 
     def clear(self):
         self.items = []
-        self.total_price = 0.0
         self.subtotal_price = 0.0
+        self.subtotal_price_tax = 0.0
         self.payment = 0.0
+
 
 class Constants:
     STORE_NAME = "Best Buy Retail Store"
     MIN_INVENTORY_AMT = 5
-    SALES_TAX = 1.10
+    SALES_TAX = 0.10
     DATE = datetime.date.today()
+
 
 inventory = Inventory()
 inventory.load_inventory()
 cart = Cart()
 
+
 def store_front():
-    store_header("(STORE FRONT)","Press [I] To View Inventory [X] to Exit", "Press [C] To View Cart")
+    store_header("(STORE FRONT)", "Press [I] To View Inventory [X] to Exit", "Press [C] To View Cart")
     inventory.print_list()
+
 
 def store_cart():
-    store_header("(CART)","Press [S] View Store [R] Remove Item", "Press [P] To Check Out")
+    store_header("(CART)", "Press [S] View Store [R] Remove Item", "Press [P] To Check Out")
     cart.print_list()
+    Cart.subtotal_price_tax = Cart.subtotal_price * (1.0 + Constants.SALES_TAX)
+    print(f"Total with sales tax is: {format_currency(Cart.subtotal_price_tax)}")
+
 
 def store_inventory():
-    store_header("(INVENTORY)","Press [S] To View Store", "Press [A] To Add Item")
+    store_header("(INVENTORY)", "Press [S] To View Store", "Press [A] To Add Item")
     inventory.print_list()
+
 
 def valid_input(label, opt=None):
     while True:
@@ -136,42 +154,40 @@ def valid_input(label, opt=None):
         except ValueError:
             print("Invalid input, please retry")
 
+
 def show_invoice():
     store_header("(RECEIPT)", "Please Come Back", "Thanks For Shopping")
     cart.print_list()
     print_line()
     discount = 0.0
-    cart.subtotal_price = cart.total_price
-    cart.sales_tax = cart.subtotal_price * Constants.SALES_TAX
-    cart.total_price = cart.total_price * Constants.SALES_TAX
-    if cart.total_price > 5000:
-      discount = cart.total_price * 0.05
-      cart.total_price -= discount
-    print(f"SUBTOTAL COST: ".ljust(18) + str(format_currency(cart.subtotal_price)))
-    print(f"SALES TAX (10%): ".ljust(18) + str(format_currency(cart.sales_tax)))
-    if discount > 0:
-      print(f"DISCOUNT (5%): ".ljust(18) + str(format_currency(discount)))
-    print(f"TOTAL COST: ".ljust(18) + str(format_currency(cart.total_price)))
-    print("CUSTOMER PAYMENT: ".ljust(18) + str(format_currency(cart.payment)))
-    print("CUSTOMER CHANGE: ".ljust(18) + str(format_currency(cart.payment - cart.total_price)))
+    print(f"SUBTOTAL COST: ".ljust(18) + str(format_currency(Cart.subtotal_price)))
+    print(f"SALES TAX (10%): ".ljust(18) + str(format_currency(Cart.subtotal_price_tax)))
+    if Cart.subtotal_price_tax > 5000:
+        discount = Cart.subtotal_price_tax * 0.05
+        print(f"DISCOUNT (5%): ".ljust(18) + str(format_currency(discount)))
+        Cart.subtotal_price_tax -= discount
+
+    print(f"TOTAL COST: ".ljust(18) + str(format_currency(Cart.subtotal_price_tax)))
+    print("CUSTOMER PAYMENT: ".ljust(18) + str(format_currency(Cart.payment)))
+    print("CUSTOMER CHANGE: ".ljust(18) + str(format_currency(Cart.payment - Cart.subtotal_price_tax)))
     print_line()
     print("THANKS FOR SHOPPING".center(75))
     print_line()
     input("\nPress any key to continue!!!!")
-    #cart.clear()
-    cart.total_price = 0.0
-    cart.payment = 0.0
-    cart.items = []
+    # cart.clear()
+    Cart.subtotal_price = 0.0
+    Cart.payment = 0.0
+    Cart.items = []
 
 
 def remove_from_cart():
-    prdId = valid_input("Enter Product ID to remove: ",)
+    prdId = valid_input("Enter Product ID to remove: ", )
     for i, (item_id, qty) in enumerate(cart.items):
         if item_id == prdId:
-            prdAmt = valid_input(f"Enter Amount to remove (max {qty}): ",)
+            prdAmt = valid_input(f"Enter Amount to remove (max {qty}): ", )
             if prdAmt <= qty:
-                cart.items[i] = (item_id, qty-prdAmt)
-                cart.total_price -= prdAmt* next(item [2] for item in inventory.items if item [0] == item_id)
+                cart.items[i] = (item_id, qty - prdAmt)
+                cart.subtotal_price -= prdAmt * next(item[2] for item in inventory.items if item[0] == item_id)
                 for j, item in enumerate(inventory.items):
                     if item[0] == prdId:
                         inventory.items[j] = (item[0], item[1], item[2], item[3] + prdAmt)
@@ -186,8 +202,11 @@ def remove_from_cart():
                         return
     print("Product not found in cart.")
 
+
 def is_string(variable):
     return isinstance(variable, str)
+
+
 def print_line():
     print("".center(77, '#'))
 
@@ -196,25 +215,25 @@ screen = 'F'
 while True:
     if screen == 'F':
         store_front()
-        prdId = valid_input("ENTER PRODUCT ID TO ADD TO CART or [I/C/X]: ", ['I','C','X'])
+        prdId = valid_input("ENTER PRODUCT ID TO ADD TO CART or [I/C/X]: ", ['I', 'C', 'X'])
         if is_string(prdId):
-            if prdId.upper() in ['I','C','X']:
+            if prdId.upper() in ['I', 'C', 'X']:
                 screen = prdId
                 continue
-        prdAmt = valid_input("ENTER AMOUNT : ",)
-        inventory.add_to_cart(prdId,prdAmt)
+        prdAmt = valid_input("ENTER AMOUNT : ", )
+        inventory.add_to_cart(prdId, prdAmt)
     elif screen == 'C':
         store_cart()
         val = valid_input(">>: ", ['S', 'P', 'R'])
         if is_string(val):
-            if val.upper() in ['S','P', 'R']:
+            if val.upper() in ['S', 'P', 'R']:
                 screen = val
                 continue
     elif screen == 'I':
         store_inventory()
         val = valid_input(">>: ", ['S', 'A'])
         if is_string(val):
-            if val.upper() in ['S','A']:
+            if val.upper() in ['S', 'A']:
                 if val.upper() == 'A':
                     name = input("Enter Product Name: ")
                     price = valid_input("Enter Product Price: ")
@@ -228,8 +247,9 @@ while True:
             if Cart.payment.upper() in ['H']:
                 screen = 'F'
                 continue
-        elif Cart.payment < Cart.total_price:
-            print(f"Can not process payment value of {Cart.payment} is less then total {Cart.total_price}")
+        elif Cart.payment < Cart.subtotal_price_tax:
+            print(
+                f"Cannot process payment value of {format_currency(Cart.payment)} is less then total {format_currency(Cart.subtotal_price_tax)}")
         else:
             screen = 'V'
     elif screen == 'R':
