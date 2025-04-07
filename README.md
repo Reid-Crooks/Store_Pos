@@ -24,5 +24,6 @@ The Authors are: Fahim Crooks and and Melodia Reid
 
 
 #### Created date: 04/02/2025
+#### Authors: Fahim Crooks and Melodia Reid
 #### Course: ITT103 
-#### Github public url: 
+#### Github public url: https://github.com/Reid-Crooks/Store_Pos.git
