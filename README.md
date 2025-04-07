@@ -13,7 +13,7 @@ The program was created to make it a little easier at check out and to help mana
 
 - run the program by calling "py" then type the name of the python file then pre enter
 
-![image3]()
+![image3](./image/Screenshot-2025-04-06-205512.png)
 
 The Authors are: Fahim Crooks and and Melodia Reid 
 
